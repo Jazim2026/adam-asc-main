@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--  Cron Job: To check  Contract  -->
+    <record id="check_contract_cron" model="ir.cron">
+        <field name="name">Check Contract Invoicing</field>
+        <field name="model_id" ref="model_contract_cases"/>
+        <field name="state">code</field>
+        <field name="code">model.check_contract_cron()</field>
+        <field name='interval_number'>1</field>
+        <field name='interval_type'>days</field>
+        <field name="numbercall">-1</field>
+    </record>
+
+</odoo>

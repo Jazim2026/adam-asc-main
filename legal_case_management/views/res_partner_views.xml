@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Form View For Res Partner-->
+    <record id="view_partner_form" model="ir.ui.view">
+        <field name="name">res.partner.view.form.inherit.legal.case.management
+        </field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="is_judge" invisible="1"/>
+                <field name="is_judge_unavailable" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_agent_form" model="ir.ui.view">
+        <field name="name">res.partner.view.form.inherit.legal.case.management
+        </field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='vat']"
+                   position="after">
+                <field name="is_agent" invisible="1"/>
+                <field name="client_referral" />
+
+                <field name="junior_lawyer_id"    invisible="client_referral not in ('by_junior_lawyer')"/>
+                <field name="agent_id"    invisible="client_referral not in ('by_agent')"/>
+
+
+                <field name="agent_code" invisible="agent_status == 'draft'"/>
+            </xpath>
+            <xpath expr="//notebook/page[@name='internal_notes']"
+                   position="after">
+                <page name="Agent" string="Agent"
+                      invisible="is_agent == False">
+                    <group string="Wages">
+                        <field name="commission_per_case"/>
+                    </group>
+                </page>
+            </xpath>
+             <xpath expr="//sheet" position="before">
+                 <header>
+                    <button name="action_create_invoice"
+                            type="object"
+                            string="Create Invoice"
+                            class="btn btn-primary"
+                            invisible="(is_agent == False) or (agent_status == 'draft')"/>
+                     <button name="action_confirm_agent"
+                            type="object"
+                            string="Confirm Agent"
+                            class="btn btn-primary"
+                            invisible="(is_agent == False) or (agent_status == 'confirm')"/>
+                     <field name="agent_status" widget="statusbar" invisible="is_agent == False"/>
+                 </header>
+            </xpath>
+        </field>
+    </record>
+    <record id="res_agent_case_smart_button" model="ir.ui.view">
+        <field name="name">res.partner.buttons</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="object" name="get_cases"
+                        invisible="is_agent == False">
+                    <field string="Case Count" name="agent_case_count" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" type="object" invisible="is_agent == False" name="compute_agent_amount">
+                    <field string="Amount" name="Wages_of_agent" widget="statinfo"/>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

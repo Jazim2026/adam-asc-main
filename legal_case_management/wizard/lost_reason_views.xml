@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form View For Wizard -->
+    <record id="lost_reason_view_form" model="ir.ui.view">
+        <field name="name">lost.reason.view.form</field>
+        <field name="model">lost.reason</field>
+        <field name="arch" type="xml">
+            <form>
+                    <group>
+                        <field name="case_ids" widget="many2many_tags"/>
+                        <field name="reason"/>
+                        <field name="lost_date"/>
+                    </group>
+                <footer>
+                    <button name="action_appeal" string="Go For Appeal"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="CANCEL" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

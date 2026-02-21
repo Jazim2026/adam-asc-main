@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    Template to add breadcrumbs to field service document
+    <template id="portal_my_home_menu_fs_request"
+              name="Portal layout : branch_request_renewal menu entries"
+              inherit_id="portal.portal_breadcrumbs" priority="65">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'br_renewal'"
+                class="breadcrumb-item active">
+                <span>Branch Renewal</span>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="company_branch_renewal_view" name="My Branch Requests">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Branch Renewal</t>
+            </t>
+            <div class="row">
+                <div class="col-md-6 col-6">
+                </div>
+            </div>
+            <div class="tab-content">
+                <t t-set="description"
+                   t-value="'There are no Branch approval request yet!'"/>
+                <div id="all" class="tab-pane fade show active w-100" role="tabpanel">
+                    <t t-call="branch_approval.no_record_portal"
+                       t-if="len(branch_renewal) == 0"/>
+                    <t t-set="table_content" t-value="branch_renewal"/>
+                    <t t-call="branch_approval.portal_branch_renewal_table"/>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="no_record_portal">
+        <div class="empty_record">
+            <center>
+                <img src="/branch_approval/static/src/img/no-data-img-removebg-preview.png" class="null_rec_img2"
+                     style="max-width: 50%;"/>
+                <h3>
+                    <strong>Currently No Records!</strong>
+                </h3>
+                <span class="all_msg" t-if="description" t-esc="description"/>
+                <br/>
+            </center>
+        </div>
+    </template>
+    <!--  Table for the content in each stage  -->
+    <template id="portal_branch_renewal_table">
+        <table class="table mt16">
+            <tbody>
+                <t t-foreach="table_content"
+                   t-as="branch_renewal">
+                    <tr>
+                        <td>
+                            <div class="service_request_row">
+                                <div class="row">
+                                    <div class="request_top col-md-8">
+                                        <span class="request-title">
+                                            <h5>
+                                                <a t-attf-href="/company/renewal/submit/{{branch_renewal.id}}"
+                                                        class="branch_renewal_name"
+                                                        t-esc="branch_renewal.name"/>
+                                            </h5>
+                                        </span>
+                                        <span class="service_req_employee mr4">
+                                            Parent Company:
+                                            <t t-esc="branch_renewal.parent_id.name"/>
+                                        </span>
+                                        <br/>
+                                        <span class="service_req_category">
+                                            Branch Manager:
+                                            <t t-esc="branch_renewal.branch_manager_id.name"/>
+                                        </span>
+                                        <br/>
+                                    </div>
+                                    <div class="request_content col-md-4">
+                                        <t t-if="branch_renewal.pan_expiry">
+                                            <span>
+                                                PAN Expiry: <t t-esc="branch_renewal.pan_expiry"/>
+                                            </span>
+                                        </t><br/>
+                                        <t t-if="branch_renewal.it_expiry">
+                                            <span>
+                                                IT Card Expiry: <t t-esc="branch_renewal.it_expiry"/>
+                                            </span>
+                                        </t><br/>
+                                        <t t-if="branch_renewal.gst_expiry">
+                                            <span>
+                                                GST Expiry: <t t-esc="branch_renewal.gst_expiry"/>
+                                            </span>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </t>
+            </tbody>
+        </table>
+    </template>
+</odoo>

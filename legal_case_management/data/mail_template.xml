@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="trail_reminder_date" model="mail.template">
+            <field name="name">Trial Date Reminder</field>
+            <field name="model_id" ref="legal_case_management.model_legal_trial"/>
+            <field name="subject">Reminder: Upcoming Trial Date for Case {{ object.case_id.name }}</field>
+            <field name="email_from">{{ object.user_id.email }}</field>
+            <field name="email_to">{{ object.client_id.email }}</field>
+            <field name="description">Reminder Email for Upcoming Trial Date</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <p>
+                        Dear<t t-out="object.client_id.name"/>,
+                    </p>
+                    <p>
+                        We hope this message finds you well. This is a friendly reminder about the upcoming trial for
+                        your case with Case No:
+                        <strong>
+                            <t t-out="object.case_id.name"/>
+                        </strong>
+                        .
+                    </p>
+                    <p>
+                        <strong>Trial Date:</strong>
+                        <t t-out="object.trial_date"/>
+                    </p>
+                    <p>
+                        <strong>Trial Type:</strong>
+                        <t t-out="object.name"/>
+                    </p>
+                    <p>
+                        Please ensure that you are prepared and have all necessary documents ready. If you have any
+                        questions or need assistance before the trial, feel free to contact us.
+                    </p>
+                    <p>
+                        Thank you for your attention to this matter.
+                    </p>
+                </div>
+            </field>
+        </record>
+
+
+        <!--       mail template sitting-->
+
+        <record id="sitting_reminder_date" model="mail.template">
+            <field name="name">Sitting Date Reminder</field>
+            <field name="model_id" ref="legal_case_management.model_case_sitting"/>
+            <field name="subject">Reminder: Upcoming Sitting Date for Case {{ object.case_id.name }}</field>
+            <field name="email_from">{{ object.case_id.user_id.email }}</field>
+            <field name="email_to">{{ object.case_id.client_id.email }}</field>
+            <field name="description">Reminder Email for Upcoming Sitting Date</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <p>
+                        Dear<t t-out="object.case_id.client_id.name"/>,
+                    </p>
+                    <p>
+                        We hope you are doing well. This is a friendly reminder about the upcoming sitting date for your
+                        case with Case No:
+                        <strong>
+                            <t t-out="object.case_id.name"/>
+                        </strong>.
+                    </p>
+                    <p>
+                        <strong>Sitting Date:</strong>
+                        <t t-out="object.date"/>
+                    </p>
+                    <p>
+                        Please make sure to review any necessary documents and be prepared for the sitting. If you have
+                        any questions or require further information, do not hesitate to reach out to us.
+                    </p>
+                    <p>
+                        Thank you for your attention to this important matter.
+                    </p>
+                </div>
+            </field>
+        </record>
+
+
+        <!--       Evidence Update -->
+
+        <record id="evidence_added_notification" model="mail.template">
+            <field name="name">New Evidence</field>
+            <field name="model_id" ref="legal_case_management.model_legal_evidence"/>
+            <field name="subject">Evidence for {{ object.case_id.name }}</field>
+            <field name="email_from">{{ (object.case_id.user_id.email) }}</field>
+            <field name="email_to">{{ object.case_id.client_id.email }}, {{ object.case_id.lawyer_id.work_email }}
+            </field>
+            <field name="description">New Evidence Information</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>
+                        Hello,
+                        <br/>
+                        <br/>
+                        This mail is to inform you that an evidence has been updated for case no:<t
+                            t-out="object.case_id.name"/>.
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <!--      Case Final Status mail -->
+
+        <record id="case_final_status_mail" model="mail.template">
+            <field name="name">Case Status Notification</field>
+            <field name="model_id" ref="legal_case_management.model_case_registration"/>
+            <field name="subject">Final Verdict on Case {{ object.name }}</field>
+            <field name="email_from">{{ object.user_id.email }}</field>
+            <field name="email_to">{{ object.client_id.email }}, {{ object.lawyer_id.work_email }}
+            </field>
+            <field name="description">Notification of Case Final Status</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <p>
+                        Dear<t t-out="object.client_id.name"/>,
+                    </p>
+                    <p>
+                        We hope this message finds you well. We are writing to update you on the final outcome of the
+                        case with Case No:
+                        <strong>
+                            <t t-out="object.name"/>
+                        </strong>
+                        .
+                    </p>
+                    <p>
+                        <strong>Final Status:</strong>
+                        <span style="color: {{ 'green' if object.state == 'won' else 'red' }};">
+                            <t t-out="object.state"/>
+                        </span>
+                    </p>
+                    <p>
+                        We understand that this news may have a significant impact, and we are here to support you
+                        through this process. If you have any questions or need further clarification, please do not
+                        hesitate to reach out.
+                    </p>
+                    <p>
+                        Thank you for your trust and cooperation throughout this case.
+                    </p>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

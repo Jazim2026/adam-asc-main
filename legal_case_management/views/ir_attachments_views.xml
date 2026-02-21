@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <!-- Attachment -->
+<!--        <record id="view_attachment_form" model="ir.ui.view">-->
+<!--             <field name="name">ir.attachment.form.inherit.legal.case.management</field>-->
+<!--            <field name="model">ir.attachment</field>-->
+<!--            <field name="inherit_id" ref="base.view_attachment_form"/>-->
+<!--            <field name="arch" type="xml">-->
+<!--               <xpath expr="//sheet" position="before">-->
+<!--                     <field name="active"/>-->
+<!--             </xpath>-->
+<!--            </field>-->
+<!--        </record>-->
+
+    <record id="legal_documents_action" model="ir.actions.act_window">
+    <field name="name">Legal Documents</field>
+    <field name="res_model">ir.attachment</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="view_mode">kanban,tree</field>
+    <field name="domain">[('res_model', '=', 'case.registration'), ('is_won', '=', False)]</field>
+</record>
+     <menuitem id="menu_attachments" name="Legal Documents" parent="menu_legal_case" sequence="4"
+              action="legal_documents_action"/>
+
+
+</odoo>

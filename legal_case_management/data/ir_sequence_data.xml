@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Generate Sequence Numbers For Case Registration, Evidence And Trial-->
+    <data noupdate="1">
+
+        <record id="sequence_case_registration" model="ir.sequence">
+            <field name="name">Case Sequence</field>
+            <field name="code">case_registration</field>
+            <field name="prefix">CASE000</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="sequence_case_contract" model="ir.sequence">
+            <field name="name">Contract Sequence</field>
+            <field name="code">contract_case</field>
+            <field name="prefix">CR000</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="sequence_case_evidence" model="ir.sequence">
+            <field name="name">Case Evidence Sequence</field>
+            <field name="code">case_evidence</field>
+            <field name="prefix">EV000</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="sequence_legal_trial" model="ir.sequence">
+            <field name="name">Legal Case Sequence</field>
+            <field name="code">legal_trial</field>
+            <field name="prefix">TR000</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="sequence_agent_creation" model="ir.sequence">
+            <field name="name">Agent Sequence</field>
+            <field name="code">agent_code</field>
+            <field name="prefix">AGT00</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="ir_cron_action_reminder_date" model="ir.cron">
+            <field name="name">Reminder Trail Date</field>
+            <field name="model_id" ref="model_legal_trial"/>
+            <field name="state">code</field>
+            <field name="code">model.remainder_trail_date()
+            </field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+        </record>
+        <record id="ir_cron_action_reminder_sitting" model="ir.cron">
+            <field name="name">Reminder Sitting Date</field>
+            <field name="model_id" ref="model_case_sitting"/>
+            <field name="state">code</field>
+            <field name="code">model.remainder_sitting_date()
+            </field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+        </record>
+    </data>
+</odoo>
