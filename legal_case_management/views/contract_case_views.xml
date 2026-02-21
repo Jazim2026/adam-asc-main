@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Tree View For Contract Cases-->
+    <record id="contract_cases_view_tree" model="ir.ui.view">
+        <field name="name">contract.cases.view.tree</field>
+        <field name="model">contract.cases</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="client_id"/>
+                <field name="case_id" optional="hide"/>
+                <field name="renewal_period"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <!-- Form view For Case Contracts -->
+    <record id="contract_cases_view_form" model="ir.ui.view">
+        <field name="name">contract.cases.view.form</field>
+        <field name="model">contract.cases</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,ongoing,stopped"/>
+
+                    <button name="action_confirm"
+                            type="object"
+                            string="Start Contract"
+                            class="btn btn-primary"
+                            invisible="state  in ['ongoing', 'stopped']"/>
+
+                    <button name="action_stop_contract"
+                            type="object"
+                            string="Stop Contract"
+                            class="btn btn-primary"
+                            invisible="state  in ['draft', 'stopped']"/>
+
+                    <button name="action_reset_draft"
+                            type="object"
+                            string="Reset to Draft"
+                            class="btn btn-primary"
+                            invisible="state  in ['draft', 'ongoing']"/>
+
+
+                </header>
+                <sheet>
+                    <div name="button_box" position="inside">
+                                                <button name="get_invoice" type="object"
+                                                        class="oe_stat_button"
+                                                        icon="fa-pencil-square-o"
+                                                        invisible="state == 'draft'">
+                                                    <div class="o_field_widget o_stat_info">
+                                                        <span class="o_stat_value">
+                                                            <field name="invoice_count"/>
+                                                        </span>
+                                                        <span class="o_stat_text">Invoice</span>
+                                                    </div>
+                                                </button>
+                    </div>
+                    <group>
+                        <h1>
+                            <field name="name" placeholder="Contract Name"/>
+                        </h1>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="client_id"/>
+                            <field name="lawyer_id" widget="many2many_tags"/>
+
+                        </group>
+                        <group>
+                            <field name="case_id" invisible="1"/>
+                            <field name="renewal_period"/>
+                            <field name="contract_start_date"/>
+                            <field name="next_invoice_date"/>
+                            <field name="contract_stop_date"/>
+                        </group>
+
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>

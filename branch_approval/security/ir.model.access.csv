@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+branch_approval.access_branch_approval,access_branch_approval,branch_approval.model_branch_approval,base.group_user,1,1,1,1
+branch_approval.access_branch_approval_portal,access_branch_approval_portal,branch_approval.model_branch_approval,base.group_portal,1,1,1,0

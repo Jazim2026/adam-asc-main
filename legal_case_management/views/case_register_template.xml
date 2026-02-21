@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template for the legal case registration view -->
+    <template id="legal_case_register_view">
+        <t t-call="website.layout">
+            <t t-set="case_categories" t-value="request.env['case.category'].sudo().search([])"/>
+            <t t-set="agent_codes" t-value="request.env['res.partner'].sudo().search([('is_agent', '=', True),('agent_status', 'in', ['confirm'])])"/>
+            <div>
+                <div>
+                    <div class="container s_allow_columns case_register_form">
+                        <div class="container">
+                            <br/>
+                            <h3 class="text-center">Case Registration</h3>
+                            <br/>
+                        </div>
+                        <div class="container mt-4 mb-5">
+                            <form role="form" action="/submit/create/case" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                <!-- Name Field (Read-only) -->
+                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
+                                    <div class="row s_col_no_resize s_col_no_bgcolor">
+                                        <label for="name" class="col-form-label col-sm-auto s_website_form_label"
+                                               style="width: 200px">
+                                            <span class="s_website_form_label_content">Name</span>
+                                        </label>
+                                        <div class="col-sm">
+                                            <input type="text" id="name" class="form-control s_website_form_input"
+                                                   name="name" readonly="readonly"
+                                                   t-att-value="request.env.user.partner_id.name"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Email Field (Read-only) -->
+                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
+                                    <div class="row s_col_no_resize s_col_no_bgcolor">
+                                        <label for="email" class="col-form-label col-sm-auto s_website_form_label"
+                                               style="width: 200px">
+                                            <span class="s_website_form_label_content">Email</span>
+                                        </label>
+                                        <div class="col-sm">
+                                            <input type="email" id="email" class="form-control s_website_form_input"
+                                                   name="email" readonly="readonly"
+                                                   t-att-value="request.env.user.email"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Case Details Field -->
+                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
+                                    <div class="row s_col_no_resize s_col_no_bgcolor">
+                                        <label for="description" class="col-form-label col-sm-auto s_website_form_label"
+                                               style="width: 200px">
+                                            <span class="s_website_form_label_content">Case Details</span>
+                                        </label>
+                                        <div class="col-sm">
+                                            <textarea id="description" class="form-control s_website_form_input"
+                                                      name="description" required="true"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Case Category Field -->
+                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
+                                    <div class="row s_col_no_resize s_col_no_bgcolor">
+                                        <label for="case_category"
+                                               class="col-form-label col-sm-auto s_website_form_label"
+                                               style="width: 200px">
+                                            <span class="s_website_form_label_content">Case Category</span>
+                                        </label>
+                                        <div class="col-sm">
+                                            <select id="case_category" class="form-control s_website_form_input"
+                                                    name="case_category" required="true">
+                                                <t t-foreach="case_categories" t-as="category">
+                                                    <option t-att-value="category.id">
+                                                        <t t-esc="category.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Agent Code Field -->
+                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
+                                    <div class="row s_col_no_resize s_col_no_bgcolor">
+                                        <label for="agent_code"
+                                               class="col-form-label col-sm-auto s_website_form_label"
+                                               style="width: 200px">
+                                            <span class="s_website_form_label_content">Agent Code</span>
+                                        </label>
+                                        <div class="col-sm">
+                                            <select id="agent_code" class="form-control s_website_form_input"
+                                                    name="agent_code" required="true">
+                                                <t t-foreach="agent_codes" t-as="agent">
+                                                    <option t-att-value="agent.id">
+                                                        <t t-esc="agent.agent_code"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Attachments Field -->
+                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
+                                    <div class="row s_col_no_resize s_col_no_bgcolor">
+                                        <label for="attachments" class="col-form-label col-sm-auto s_website_form_label"
+                                               style="width: 200px">
+                                            <span class="s_website_form_label_content">Attachments</span>
+                                        </label>
+                                        <div class="col-sm">
+                                            <input id="attachments" class="form-control-file file s_website_form_input"
+                                                   type="file" name="attachments" multiple="true"
+                                                   accept="image/*,application/pdf,video/*"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Contact No Field -->
+                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
+                                    <div class="row s_col_no_resize s_col_no_bgcolor">
+                                        <label for="contact" class="col-form-label col-sm-auto s_website_form_label"
+                                               style="width: 200px">
+                                            <span class="s_website_form_label_content">Contact No</span>
+                                        </label>
+                                        <div class="col-sm">
+                                            <input id="contact" type="text" class="form-control s_website_form_input"
+                                                   name="contact" required="true"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
+                                    <div class="form-group col-12 s_website_form_submit" data-name="Submit Button">
+                                        <div style="width: 200px;" class="s_website_form_label"></div>
+                                        <button type="submit" id="upload" class="btn btn-primary btn-block upload">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

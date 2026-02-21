@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="company_branch_request_view">
+        <t t-call="website.layout">
+            <div class="oe_structure oe_empty">
+                <div>
+                    <div class="container s_allow_columns">
+                        <div class="container">
+                            <br/>
+                            <h3 class="text-center">Branch Request</h3>
+                            <br/>
+                        </div>
+                        <div class="container mt-4 mb-5 branch_request">
+                            <form role="form" action="/submit/create/company" method="POST"
+                                  enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <div class="container">
+                                    <br/>
+                                    <h3 class="text-center"><input type="text" id="name" class="form-control s_website_form_input"
+                                                    required="true" name="name" placeholder="Name..."/></h3>
+                                    <br/>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="address_1" class="col-form-label s_website_form_label">Address 1
+                                        </label>
+                                        <input type="text" id="address_1" class="form-control s_website_form_input"
+                                               name="address_1" required="true" placeholder="Street..."/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="phone" class="col-form-label s_website_form_label">Phone</label>
+                                        <input type="tel" id="phone" class="form-control s_website_form_input"
+                                               name="phone" required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="address_2" class="col-form-label s_website_form_label">Address 2
+                                        </label>
+                                        <input type="text" id="address_2" class="form-control s_website_form_input"
+                                               name="address_2" placeholder="Street2..."/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="mobile" class="col-form-label s_website_form_label">Mobile</label>
+                                        <input type="tel" id="mobile" class="form-control s_website_form_input"
+                                               name="mobile"/>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="city" class="col-form-label s_website_form_label">City</label>
+                                        <input type="text" id="city" class="form-control s_website_form_input"
+                                               name="city" required="true"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="state" class="col-form-label s_website_form_label">State</label>
+                                        <select class="form-control" name="state"
+                                                id="state" required="true">
+                                            <option/>
+                                            <t t-foreach="state" t-as="rec">
+                                                <option t-att-value="rec.id">
+                                                    <t t-out="rec.name"/>
+                                                </option>
+                                            </t>
+
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="country" class="col-form-label s_website_form_label">Country</label>
+                                        <select class="form-control" name="country"
+                                                id="country" required="true">
+                                            <option/>
+                                            <t t-foreach="country" t-as="rec">
+                                                <option t-att-value="rec.id">
+                                                    <t t-out="rec.name"/>
+                                                </option>
+                                            </t>
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="pin_code" class="col-form-label s_website_form_label">Pin Code
+                                        </label>
+                                        <input type="text" id="pin_code" class="form-control s_website_form_input"
+                                               name="pin_code" required="true"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="website" class="col-form-label s_website_form_label">Website</label>
+                                        <input type="url" id="website" class="form-control s_website_form_input"
+                                               name="website"/>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="email" class="col-form-label s_website_form_label">Email</label>
+                                        <input type="email" id="email" class="form-control s_website_form_input"
+                                               name="email" required="true"/>
+                                    </div>
+                                     <div class="col-md-4">
+                                        <label for="company_id" class="col-form-label s_website_form_label">Company ID
+                                        </label>
+                                        <input type="text" id="company_id" class="form-control s_website_form_input"
+                                               name="company_id"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="tax_id" class="col-form-label s_website_form_label">Tax Id</label>
+                                        <input type="text" id="tax_id" class="form-control s_website_form_input"
+                                               name="tax_id"/>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="pan_id" class="col-form-label s_website_form_label">PAN Id</label>
+                                        <input type="text" id="pan_id" class="form-control s_website_form_input"
+                                               name="pan_id"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="pan_copy" class="col-form-label s_website_form_label">Pan Copy</label>
+                                        <input type="file" class="file form-control" name="pan_copy"
+                                           id="pan_copy" accept="image/*,application/pdf"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="pan_expiry" class="col-form-label s_website_form_label">PAN Expiry Date</label>
+                                        <input type="date" id="pan_expiry" class="form-control s_website_form_input" name="pan_expiry"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="gst_id" class="col-form-label s_website_form_label">Gst Id</label>
+                                        <input type="text" id="gst_id" class="form-control s_website_form_input"
+                                               name="gst_id" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="gst_copy" class="col-form-label s_website_form_label">Gst Copy</label>
+                                        <input type="file" class="file form-control" name="gst_copy"
+                                           id="gst_copy" accept="image/*,application/pdf"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="gst_expiry" class="col-form-label s_website_form_label">Gst Expiry Date</label>
+                                        <input type="date" id="gst_expiry" class="form-control s_website_form_input" name="gst_expiry"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="it_card" class="col-form-label s_website_form_label">IT Card</label>
+                                        <input type="text" id="it_card" class="form-control s_website_form_input"
+                                               name="it_card"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="it_copy" class="col-form-label s_website_form_label">IT Card Copy</label>
+                                        <input type="file" class="file form-control" name="it_copy"
+                                           id="it_copy" accept="image/*,application/pdf"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="it_expiry" class="col-form-label s_website_form_label">IT Card Expiry Date</label>
+                                        <input type="date" id="it_expiry" class="form-control s_website_form_input" name="it_expiry"/>
+                                    </div>
+                                </div>
+                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
+                                        <div class="col-md-4">
+                                            <label for="attachment_ids" class="col-form-label col-sm-auto s_website_form_label">
+                                                Shop Images
+                                            </label>
+                                            <input type="file" multiple="true" class="file form-control" name="attachment_ids"
+                                           id="attachment_ids" accept="image/*,application/pdf"/>
+                                        </div>
+                                    </div>
+                                <br/>
+                                <div class="mb-3">
+                                    <button type="submit" id="save" class="btn btn-primary btn-block upload">Continue</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

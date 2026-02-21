@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        id="menu_hr_employee_user"
+        name="Branch Requests"
+        action="branch_approval.company_branch_request_action"
+        parent="base.menu_users"
+        groups="base.group_system"
+        sequence="4"/>
+</odoo>

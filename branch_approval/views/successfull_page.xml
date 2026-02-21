@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--    Template For Success Page-->
+    <template id="success_page">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container">
+                    <h1>Thanks!</h1>
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="alert alert-success"
+                                 role="status">
+                                Your request has been
+                                submitted
+                                successfully.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

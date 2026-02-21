@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    Template to add breadcrumbs to field service document
+    <template id="portal_my_home_menu_fs_request"
+              name="Portal layout : branch_request_approval menu entries"
+              inherit_id="portal.portal_breadcrumbs" priority="65">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'br_requests'"
+                class="breadcrumb-item active">
+                <span>Branch Approval Request</span>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="company_branch_approval_view" name="My Branch Requests">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Branch Request Approvals</t>
+            </t>
+            <div class="row">
+                <div class="col-md-6 col-6">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link border-white active"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#all" type="button"
+                                    role="tab" aria-controls="profile"
+                                    aria-selected="false">All
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link border-white"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#approve" type="button"
+                                    role="tab" aria-controls="profile"
+                                    aria-selected="false">Approved
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link border-white"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#reject" type="button"
+                                    role="tab" aria-controls="profile"
+                                    aria-selected="false">Rejected
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6 col-6  d-flex justify-content-end">
+                    <a href="/company/branch/request"
+                       class="btn btn-primary create_ticket_btn mt24 mb8">
+                        Create Request
+                    </a>
+
+                </div>
+            </div>
+            <div class="tab-content">
+                <t t-set="url" t-value="'/company/branch/request'"/>
+                <t t-set="description"
+                   t-value="'There are no Branch approval request yet!'"/>
+                <div id="all" class="tab-pane fade show active w-100" role="tabpanel">
+                    <t t-call="branch_approval.no_record_portal"
+                       t-if="len(branch_all) == 0"/>
+                    <t t-set="table_content" t-value="branch_all"/>
+                    <t t-call="branch_approval.portal_branch_request_table"/>
+                </div>
+                <div id="approve" class="tab-pane fade  w-100" role="tabpanel">
+                    <t t-call="branch_approval.no_record_portal"
+                       t-if="len(branch_approve) == 0"/>
+                    <t t-set="table_content" t-value="branch_approve"/>
+                    <t t-call="branch_approval.portal_branch_request_table"/>
+                </div>
+                <div id="reject" class="tab-pane fade  w-100" role="tabpanel">
+                    <t t-call="branch_approval.no_record_portal"
+                       t-if="len(branch_reject) == 0"/>
+                    <t t-set="table_content"
+                       t-value="branch_reject"/>
+                    <t t-call="branch_approval.portal_branch_request_table"/>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="no_record_portal">
+        <div class="empty_record">
+            <center>
+                <img src="/branch_approval/static/src/img/no-data-img-removebg-preview.png" class="null_rec_img2"
+                     style="max-width: 50%;"/>
+                <h3>
+                    <strong>Currently No Records!</strong>
+                </h3>
+                <span class="all_msg" t-if="description" t-esc="description"/>
+                <br/>
+                <a t-att-href="url" t-if="url">Create New</a>
+            </center>
+        </div>
+    </template>
+    <!--  Table for the content in each stage  -->
+    <template id="portal_branch_request_table">
+        <table class="table mt16">
+            <tbody>
+                <t t-foreach="table_content"
+                   t-as="branch_request">
+                    <tr>
+                        <td>
+                            <div class="service_request_row">
+                                <div class="row">
+                                    <div class="request_top col-md-8">
+                                        <span class="request-title">
+                                            <h5>
+                                                <span
+                                                        class="service_request_name"
+                                                        t-esc="branch_request.name"/>
+                                            </h5>
+                                        </span>
+                                        <span class="service_req_employee mr4">
+                                            Parent Company:
+                                            <t t-esc="branch_request.parent_id.name"/>
+                                        </span>
+                                        <br/>
+                                        <span class="service_req_category">
+                                            Branch Manager:
+                                            <t t-esc="branch_request.branch_manager_id.name"/>
+                                        </span>
+                                        <br/>
+                                    </div>
+                                    <div class="request_content col-md-4">
+                                        <t t-if="branch_request.state == 'pending'">
+                                            <span class="badge state_badge text-bg-warning">
+                                                <t t-esc="branch_request.state.capitalize()"/>
+                                            </span>
+                                        </t>
+                                        <t t-if="branch_request.state == 'approve'">
+                                            <span class="badge state_badge text-bg-success">
+                                                <t t-esc="branch_request.state.capitalize()"/>
+                                            </span>
+                                        </t>
+                                        <t t-if="branch_request.state == 'reject'">
+                                            <span class="badge state_badge text-bg-danger">
+                                                <t t-esc="branch_request.state.capitalize()"/>
+                                            </span>
+                                        </t>
+                                        <div class="o_cyllo_service_date">
+                                            <t t-if="branch_request.create_date">
+                                                <span t-field="branch_request.create_date"
+                                                      class="date"/>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </t>
+            </tbody>
+        </table>
+    </template>
+</odoo>
