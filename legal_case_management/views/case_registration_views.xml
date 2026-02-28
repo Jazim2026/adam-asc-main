@@ -17,36 +17,36 @@
         </field>
     </record>
 
-<record id="case_registration_view_search" model="ir.ui.view">
-    <field name="name">case.registration.search</field>
-    <field name="model">case.registration</field>
-    <field name="arch" type="xml">
-        <search>
-            <field name="name"/>
-            <field name="email"/>
-            <field name="client_id"/>
-            <field name="contact_no"/>
+    <record id="case_registration_view_search" model="ir.ui.view">
+        <field name="name">case.registration.search</field>
+        <field name="model">case.registration</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="client_id"/>
+                <field name="contact_no"/>
 
-            <filter string="Non-Billable Cases" name="is_non_billable_case"
-                    domain="[('is_non_billable_case', '=', True)]"/>
+                <filter string="Non-Billable Cases" name="is_non_billable_case"
+                        domain="[('is_non_billable_case', '=', True)]"/>
 
-            <filter string="Cases Waiting For Approval" name="state" domain="[('state', '=', 'waiting_approval')]"/>
+                <filter string="Cases Waiting For Approval" name="state" domain="[('state', '=', 'waiting_approval')]"/>
 
-              <filter string="Draft and In Progress Cases" name="default_cases"
-                domain="['|', ('state', '=', 'in_progress'), ('state', '=', 'draft')]"/>
-            <group expand="0" string="Group By">
-                <filter string="Customer" name="client_id" context="{'group_by': 'client_id'}"/>
-                <filter string="Lawyer" name="lawyer_id" context="{'group_by': 'lawyer_id'}"/>
-                <filter string="Agent" name="agent_id" context="{'group_by': 'agent_id'}"/>
-                <filter string="Judge" name="judge_id" context="{'group_by': 'judge_id'}"/>
-                <filter string="Case Start Date" name="start_date" context="{'group_by': 'start_date'}"/>
-            </group>
-            <searchpanel>
-                <field name="case_category_id" enable_counters="1"/>
-            </searchpanel>
-        </search>
-    </field>
-</record>
+                <filter string="Draft and In Progress Cases" name="default_cases"
+                        domain="['|', ('state', '=', 'in_progress'), ('state', '=', 'draft')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Customer" name="client_id" context="{'group_by': 'client_id'}"/>
+                    <filter string="Lawyer" name="lawyer_id" context="{'group_by': 'lawyer_id'}"/>
+                    <filter string="Agent" name="agent_id" context="{'group_by': 'agent_id'}"/>
+                    <filter string="Judge" name="judge_id" context="{'group_by': 'judge_id'}"/>
+                    <filter string="Case Start Date" name="start_date" context="{'group_by': 'start_date'}"/>
+                </group>
+                <searchpanel>
+                    <field name="case_category_id" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
 
     <!-- Kanban View For Case registration-->
     <record id="case_registration_view_kanban" model="ir.ui.view">
@@ -143,8 +143,8 @@
                     <button name="action_restart_contract"
                             string="Restart Contract"
                             type="object"
-                             invisible="state != 'contract_finished'"
-                            />
+                            invisible="state != 'contract_finished'"
+                    />
                     <button name="action_won"
                             string="Won" type="object"
                             class="oe_highlight"
@@ -155,6 +155,10 @@
                             invisible="state != 'invoiced'"/>
                     <button name="action_send_document_request" string="Document Request"
                             type="object" class="btn-primary" invisible="state in ('cancel','lost','won')"/>
+                    <button name="action_case_details"
+                            string="Case Details"
+                            type="object"
+                            class="oe_highlight"/>
                     <button name="action_cancel"
                             string="Cancel" type="object"
                             class="btn-secondary"
@@ -162,7 +166,7 @@
                     <button name="action_reset_to_draft"
                             string="Reset To Draft" type="object"
                             class="oe_highlight" invisible="state != 'cancel'"/>
-                     <button name="action_out_of_court_settlement"
+                    <button name="action_out_of_court_settlement"
                             string="Out Of Court Settlement" type="object"
                             class="oe_highlight" invisible="state  in ['cancel', 'out_of_court_settlement', 'draft']"/>
                 </header>
@@ -233,7 +237,7 @@
                             <field name="end_date" readonly="1"
                                    invisible="state  in ['invoiced', 'in_progress', 'draft']"/>
                             <field name="contact_no"/>
-                              <field name="payment_method"
+                            <field name="payment_method"
                                    invisible="is_non_billable_case"
                             />
                             <field name="contract_id"
@@ -242,7 +246,7 @@
                             />
                             <field name="register_date"
                                    invisible="state != 'draft'"/>
-                             <field name="is_court_out_of_settlement" invisible="1"/>
+                            <field name="is_court_out_of_settlement" invisible="1"/>
                             <field name="case_ids" widget='many2many_tags'/>
                         </group>
                     </group>
@@ -327,10 +331,7 @@
     </record>
 
 
-
-
-
-     <!--    Server action to merge po-->
+    <!--    Server action to merge po-->
     <record id="action_lost" model="ir.actions.server">
         <field name="name">Lost</field>
         <field name="model_id" ref="model_case_registration"/>
@@ -338,7 +339,7 @@
         <field name="state">code</field>
         <field name="code">
             if records:
-               action = records.action_lost()
+            action = records.action_lost()
         </field>
     </record>
 </odoo>

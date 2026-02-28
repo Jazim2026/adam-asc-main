@@ -458,7 +458,15 @@ class CaseRegistration(models.Model):
             'email_to': self.client_id.email,
         }
         self.env['mail.mail'].sudo().create(main_content).send()
-        
+
+    def action_case_details(self):
+        """Button to open eCourts case status page"""
+        return {
+            'type': 'ir.actions.act_url',
+            'url': 'https://services.ecourts.gov.in/ecourtindia_v6/?p=casestatus/index',
+            'target': 'new',
+        }
+
     def action_out_of_court_settlement(self):
         default_document_mode = self.env.context.get('default_document_mode',
                                                         self.env.context.get('composition_mode', 'comment'))
@@ -517,6 +525,7 @@ class CaseRegistration(models.Model):
     def search_country_name(self,login=None, **kwargs ):
         country_id = self.env['res.country'].sudo().search_read([], ['id', 'name'])
         return country_id
+
 
 
 
