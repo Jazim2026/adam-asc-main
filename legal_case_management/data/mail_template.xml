@@ -60,7 +60,8 @@
                         case with Case No:
                         <strong>
                             <t t-out="object.case_id.name"/>
-                        </strong>.
+                        </strong>
+                        .
                     </p>
                     <p>
                         <strong>Sitting Date:</strong>
@@ -145,6 +146,62 @@
                 </div>
             </field>
         </record>
+        <!-- Case Submitted - Admin Notification -->
+        <record id="case_submitted_admin_mail" model="mail.template">
+            <field name="name">Case Submitted - Admin Notification</field>
+            <field name="model_id" ref="legal_case_management.model_case_registration"/>
+            <field name="subject">New Case Submitted: {{ object.name }}</field>
+            <field name="email_from">{{ object.user_id.email }}</field>
+            <field name="email_to">lawvexbot@gmail.com</field>
+            <field name="description">Notification to Admin when a new case is submitted</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <p>A new case has been submitted and requires your approval.</p>
+                    <p>
+                        <strong>Client:</strong>
+                        <t t-out="object.client_id.name"/>
+                    </p>
+                    <p>
+                        <strong>Case Category:</strong>
+                        <t t-out="object.case_category_id.name"/>
+                    </p>
+                    <p>
+                        <strong>Contact No:</strong>
+                        <t t-out="object.contact_no"/>
+                    </p>
+                    <p>
+                        <strong>Email:</strong>
+                        <t t-out="object.email"/>
+                    </p>
+                    <p>Please login to review and approve the case.</p>
+                </div>
+            </field>
+        </record>
 
+        <!-- Case Approved - Client Notification -->
+        <record id="case_approved_client_mail" model="mail.template">
+            <field name="name">Case Approved - Client Notification</field>
+            <field name="model_id" ref="legal_case_management.model_case_registration"/>
+            <field name="subject">Your Case Has Been Approved: {{ object.name }}</field>
+            <field name="email_from">{{ object.user_id.email }}</field>
+            <field name="email_to">{{ object.client_id.email }}</field>
+            <field name="description">Notification to Client when case is approved</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <p>Dear<t t-out="object.client_id.name"/>,
+                    </p>
+                    <p>Your case has been reviewed and approved.</p>
+                    <p>
+                        <strong>Case No:</strong>
+                        <t t-out="object.name"/>
+                    </p>
+                    <p>
+                        <strong>Case Category:</strong>
+                        <t t-out="object.case_category_id.name"/>
+                    </p>
+                    <p>We will keep you updated on further progress. Thank you.</p>
+                </div>
+            </field>
+        </record>
     </data>
 </odoo>

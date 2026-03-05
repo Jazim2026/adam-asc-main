@@ -4,7 +4,8 @@
     <template id="legal_case_register_view">
         <t t-call="website.layout">
             <t t-set="case_categories" t-value="request.env['case.category'].sudo().search([])"/>
-            <t t-set="agent_codes" t-value="request.env['res.partner'].sudo().search([('is_agent', '=', True),('agent_status', 'in', ['confirm'])])"/>
+            <t t-set="agent_codes"
+               t-value="request.env['res.partner'].sudo().search([('is_agent', '=', True),('agent_status', 'in', ['confirm'])])"/>
             <div>
                 <div>
                     <div class="container s_allow_columns case_register_form">
@@ -14,7 +15,8 @@
                             <br/>
                         </div>
                         <div class="container mt-4 mb-5">
-                            <form role="form" action="/submit/create/case" method="POST" enctype="multipart/form-data">
+                            <form role="form" action="/submit/create/case" method="POST" enctype="multipart/form-data"
+                                  data-editor-message="This is a custom form">
                                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
 
                                 <!-- Name Field (Read-only) -->
@@ -82,25 +84,6 @@
                                     </div>
                                 </div>
                                 <!-- Agent Code Field -->
-                                <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">
-                                    <div class="row s_col_no_resize s_col_no_bgcolor">
-                                        <label for="agent_code"
-                                               class="col-form-label col-sm-auto s_website_form_label"
-                                               style="width: 200px">
-                                            <span class="s_website_form_label_content">Agent Code</span>
-                                        </label>
-                                        <div class="col-sm">
-                                            <select id="agent_code" class="form-control s_website_form_input"
-                                                    name="agent_code" required="true">
-                                                <t t-foreach="agent_codes" t-as="agent">
-                                                    <option t-att-value="agent.id">
-                                                        <t t-esc="agent.agent_code"/>
-                                                    </option>
-                                                </t>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
 
                                 <!-- Attachments Field -->
                                 <div class="mb-0 py-2 col-12 s_website_form_field s_website_form_custom s_website_form_required">

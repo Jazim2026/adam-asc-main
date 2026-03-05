@@ -46,7 +46,6 @@ class CaseRegistration(models.Model):
         ('case', "Per Case"),
         ('per_contract', "Per Contract"),
         ('out_of_court', "Out of Court")], string='Payment Method',
-        states={'draft': [('invisible', True)]},
         help="Payment method to select one method")
 
     lawyer_wage = fields.Char(string="Lawyer Wage", help="wage of the lawyers",
@@ -100,9 +99,9 @@ class CaseRegistration(models.Model):
                                    compute='_compute_invoice_count',
                                    help="Count of Invoices")
     state = fields.Selection(
-        [('draft', 'Draft'), ('waiting_approval', 'Waiting For Approval'),('in_progress', 'In Progress'),
-         ('invoiced', 'Invoiced'), ('reject', 'Reject'),('out_of_court_settlement', 'Out Of Court settlement'),
-         ('won', 'Won'), ('lost', 'Lost'), ('cancel', 'Cancel'),('contract_finished', 'Contract Finished'),],
+        [('draft', 'Draft'), ('waiting_approval', 'Waiting For Approval'), ('in_progress', 'In Progress'),
+         ('invoiced', 'Invoiced'), ('reject', 'Reject'), ('out_of_court_settlement', 'Out Of Court settlement'),
+         ('won', 'Won'), ('lost', 'Lost'), ('cancel', 'Cancel'), ('contract_finished', 'Contract Finished'), ],
         string='State', default='draft', help="State of case")
     company_id = fields.Many2one("res.company", string="Company",
                                  default=lambda self: self.env.company,
@@ -111,10 +110,10 @@ class CaseRegistration(models.Model):
     case_serial_number = fields.Char(string="Case Serial No", help="Court Case number", tracking=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, readonly=True)
     agent_id = fields.Many2one('res.partner', string='Agent',
-                               domain=[('is_agent', '=', True),('agent_status', 'in', ['confirm'])],
+                               domain=[('is_agent', '=', True), ('agent_status', 'in', ['confirm'])],
                                help="Agents for reference")
     needed_doc = fields.Text(string='Document Needed', default=" ",
-                            help="Document needed by requestor")
+                             help="Document needed by requestor")
     is_non_billable_case = fields.Boolean(string="Non-Billable Case",
                                           default=False)
     contract_id = fields.Many2one('contract.cases')
@@ -132,6 +131,8 @@ class CaseRegistration(models.Model):
 
     def action_approve(self):
         self.state = 'in_progress'
+        template = self.env.ref('legal_case_management.case_approved_client_mail')
+        template.sudo().send_mail(self.id, force_send=True)
 
     def action_restart_contract(self):
         self.state = 'in_progress'
@@ -146,26 +147,21 @@ class CaseRegistration(models.Model):
             }
         }
 
-
     @api.onchange('client_id')
     def update_referral(self):
         if self.client_id:
 
             # By Agent
             if self.client_id.client_referral == "by_agent":
-                self.agent_id=self.client_id.agent_id
+                self.agent_id = self.client_id.agent_id
             else:
-                self.agent_id=False
+                self.agent_id = False
 
             # By Junior Lawyer
             if self.client_id.client_referral == "by_junior_lawyer":
-                self.junior_lawyer_id=self.client_id.junior_lawyer_id
+                self.junior_lawyer_id = self.client_id.junior_lawyer_id
             else:
-                self.junior_lawyer_id=False
-
-
-
-
+                self.junior_lawyer_id = False
 
     @api.onchange('payment_method')
     def _onchange_payment_method(self):
@@ -243,12 +239,15 @@ class CaseRegistration(models.Model):
     def action_confirm(self):
         """Confirmation of Cases"""
         if self.is_non_billable_case:
-            self.state='waiting_approval'
+            self.state = 'waiting_approval'
         else:
             self.state = 'in_progress'
         if self.name == 'New':
             self.name = self.env['ir.sequence']. \
                             next_by_code('case_registration') or 'New'
+            template = self.env.ref('legal_case_management.case_submitted_admin_mail')
+            template.sudo().send_mail(self.id, force_send=True)
+
     def action_reject(self):
         """Rejection of Cases"""
         self.write({'state': 'reject'})
@@ -374,7 +373,7 @@ class CaseRegistration(models.Model):
             'view_mode': 'form',
             'target': 'new',
             'context': {
-                'default_case_ids': case_ids,}
+                'default_case_ids': case_ids, }
         }
 
     def _compute_evidence_count(self):
@@ -469,7 +468,7 @@ class CaseRegistration(models.Model):
 
     def action_out_of_court_settlement(self):
         default_document_mode = self.env.context.get('default_document_mode',
-                                                        self.env.context.get('composition_mode', 'comment'))
+                                                     self.env.context.get('composition_mode', 'comment'))
         doc_context = dict(default_document_mode=default_document_mode, default_model='case.registration',
                            mail_tz=self.env.user.tz,
                            )
@@ -502,34 +501,25 @@ class CaseRegistration(models.Model):
         return branch_records
 
     def search_case_category(self, userId=None, **kwargs):
-        case_category_records = self.env['case.category'].sudo().search_read([],['name','id'])
+        case_category_records = self.env['case.category'].sudo().search_read([], ['name', 'id'])
         return case_category_records
 
     def search_company_name(self, login=None, **kwargs):
         user_data = self.env['res.users'].sudo().search_read([('id', '=', login)], ['company_id'])
         company_id = user_data[0]['company_id'][0]
-        company_data = self.env['res.company'].sudo().search_read([('id', '=', company_id)],['name', 'id'])
+        company_data = self.env['res.company'].sudo().search_read([('id', '=', company_id)], ['name', 'id'])
         return company_data
 
-    def search_partner(self,login=None, **kwargs):
+    def search_partner(self, login=None, **kwargs):
         user_data = self.env['res.users'].sudo().search_read([('id', '=', login)], ['partner_id'])
         partner_id = user_data[0]['partner_id'][0]
-        partner_data = self.env['res.partner'].sudo().search_read([('id', '=', partner_id)],['name', 'id'])
+        partner_data = self.env['res.partner'].sudo().search_read([('id', '=', partner_id)], ['name', 'id'])
         return partner_data
 
-
-    def search_agent(self,login=None, **kwargs):
-        agent_data = self.env['res.partner'].sudo().search_read([('is_agent', '=', True)], ['id','name'])
+    def search_agent(self, login=None, **kwargs):
+        agent_data = self.env['res.partner'].sudo().search_read([('is_agent', '=', True)], ['id', 'name'])
         return agent_data
 
-    def search_country_name(self,login=None, **kwargs ):
+    def search_country_name(self, login=None, **kwargs):
         country_id = self.env['res.country'].sudo().search_read([], ['id', 'name'])
         return country_id
-
-
-
-
-
-
-
-        

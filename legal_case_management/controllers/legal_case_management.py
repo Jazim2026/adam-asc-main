@@ -20,7 +20,6 @@
 #
 ###############################################################################
 import base64
-from pickle import FALSE
 
 from odoo import http
 from odoo.http import request
@@ -28,6 +27,7 @@ from odoo.http import request
 
 class LegalCaseController(http.Controller):
     """Legal Case Controller"""
+
     @http.route('/legal/case/register', type="http", auth="user", website=True)
     def legal_case_register(self):
         """ Returns Case Registration Form"""
@@ -46,10 +46,9 @@ class LegalCaseController(http.Controller):
         case = request.env['case.registration'].sudo().create({
             'client_id': request.env.user.partner_id.id,
             'email': request.env.user.partner_id.email,
-            'contact_no': kw['contact'],
-            'description': kw['description'],
-            'case_category_id': int(kw['case_category']),
-            'agent_id': int(kw['agent_code']),
+            'contact_no': kw.get('contact'),
+            'description': kw.get('description'),
+            'case_category_id': int(kw.get('case_category')) if kw.get('case_category') else False,
             'company_id': request.env.company.id,
         })
         for attachment in attached_files:
@@ -60,6 +59,9 @@ class LegalCaseController(http.Controller):
                 'type': 'binary',
                 'datas': base64.b64encode(attachment.read())
             })
+            # Admin-ന് mail അയക്കുക
+            template = request.env.ref('legal_case_management.case_submitted_admin_mail')
+            template.sudo().send_mail(case.id, force_send=True)
         return request.render("legal_case_management.thanks_page")
 
     @http.route('/api/submit/create/case', type="json", methods=['POST'], auth='public', csrf=False)
@@ -73,13 +75,12 @@ class LegalCaseController(http.Controller):
             if key.startswith('attachments'):
                 attached_files.append(file)
         case = request.env['case.registration'].sudo().create({
-            'client_id': kw['client_id'],
-            'email': kw['email'],
-            'contact_no': kw['contact'],
-            'description': kw['description'],
-            'case_category_id': int(kw['case_category']),
-            'agent_id': int(kw['agent_code']),
-            'company_id': kw['company_id'],
+            'client_id': kw.get('client_id'),
+            'email': kw.get('email'),
+            'contact_no': kw.get('contact'),
+            'description': kw.get('description'),
+            'case_category_id': int(kw.get('case_category')) if kw.get('case_category') else False,
+            'company_id': kw.get('company_id') or request.env.company.id,
         })
         for attachment in attached_files:
             request.env['ir.attachment'].sudo().create({
@@ -89,4 +90,3 @@ class LegalCaseController(http.Controller):
                 'type': 'binary',
                 'datas': base64.b64encode(attachment.read())
             })
-
