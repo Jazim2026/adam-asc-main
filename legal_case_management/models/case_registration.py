@@ -447,16 +447,15 @@ class CaseRegistration(models.Model):
         }
 
     def action_send_document_request(self):
-        """Function to send document request through email """
-        user_id = self.env['res.users'].browse(self.env.uid)
-        mail_content = f'Hello <br/> {user_id.name} Requested Document <br/>' \
-                       f'{self.needed_doc}'
-        main_content = {
-            'subject': _('Document Request'),
-            'body_html': mail_content,
-            'email_to': self.client_id.email,
+        """Open wizard for document request email"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Document Request',
+            'res_model': 'document.request.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_case_id': self.id},
         }
-        self.env['mail.mail'].sudo().create(main_content).send()
 
     def action_case_details(self):
         """Button to open eCourts case status page"""

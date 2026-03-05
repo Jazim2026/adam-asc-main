@@ -56,6 +56,7 @@
                         <th>Date</th>
                         <th class='d-none d-md-table-cell'>Details</th>
                         <th>Status</th>
+                        <th>Document</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,6 +73,17 @@
                             </td>
                             <td>
                                 <t t-esc="case.description"/>
+                            </td>
+                            <td>
+                                <t t-foreach="case.attachment_ids" t-as="attachment">
+                                    <a t-att-href="'/web/content/%s?download=true' % attachment.id"
+                                       t-att-title="attachment.name">
+                                        <i class="fa fa-paperclip"/> <t t-esc="attachment.name"/>
+                                    </a><br/>
+                                </t>
+                                <t t-if="not case.attachment_ids">
+                                    <span class="text-muted">No documents</span>
+                                </t>
                             </td>
                             <td>
                                 <t t-if="case.state=='draft'">

@@ -36,3 +36,4 @@ access_lost_reason_lawyer,access.lost.reason.lawyer,model_lost_reason,legal_case
 access_lost_reason_clerk,access.lost.reason.clerk,model_lost_reason,legal_case_management.legal_case_management_group_clerk,1,0,0,0
 access_legal_case_report_user,access.legal.case.report.user,model_legal_case_report,base.group_user,1,1,1,1
 legal_case_management.access_contract_cases,access_contract_cases,legal_case_management.model_contract_cases,legal_case_management.legal_case_management_group_admin,1,1,1,1
+access_document_request_wizard,document.request.wizard,model_document_request_wizard,base.group_user,1,1,1,1

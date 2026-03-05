@@ -49,6 +49,7 @@
         'wizard/full_settlement_views.xml',
         'wizard/legal_case_report_views.xml',
         'wizard/lost_reason_views.xml',
+        'wizard/document_request_wizard_views.xml',
         'views/legal_case_management_menus.xml',
         'report/case_registration_reports.xml',
         'report/legal_case_reports.xml',
