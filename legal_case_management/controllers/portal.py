@@ -83,6 +83,24 @@ class PortalLegalCase(CustomerPortal):
         return request.render("legal_case_management.portal_legal_case_page",
                               records)
 
+    @http.route('/my/cases/<int:case_id>/upload',
+                type='http', auth='user', methods=['POST'], website=True)
+    def upload_case_document(self, case_id, **kwargs):
+        """Client upload cheyta files save cheyyuka"""
+        import base64
+        case = request.env['case.registration'].sudo().browse(case_id)
+        attachment_file = kwargs.get('attachment')
+
+        if attachment_file and case:
+            request.env['ir.attachment'].sudo().create({
+                'name': attachment_file.filename,
+                'res_model': 'case.registration',
+                'res_id': case_id,
+                'datas': base64.b64encode(attachment_file.read()),
+                'mimetype': attachment_file.content_type,
+            })
+        return request.redirect('/my/cases/%s' % case_id)
+
 class LegalCaseMeeting(http.Controller):
 
     @http.route(['/my/cases/schedule_meeting/<int:case_id>'], type='http', auth="user", website=True)
