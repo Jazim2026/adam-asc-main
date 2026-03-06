@@ -42,7 +42,7 @@ class DocumentRequestWizard(models.TransientModel):
                 <!-- Upload Link -->
                 <div style="margin-top: 20px; text-align: center;">
                     <p>Please upload the required documents by clicking the button below:</p>
-                   <a href="https://app.lawvex.legal/my/cases/{case.id}"
+                    <a href="https://app.lawvex.legal/my/cases/{case.id}"
                        style="background-color: #3b0764; color: white; padding: 12px 25px;
                               text-decoration: none; border-radius: 5px; display: inline-block;">
                         Upload Documents
