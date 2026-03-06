@@ -126,6 +126,13 @@ class CaseRegistration(models.Model):
         string='Reference Cases',
         help='Reference cases'
     )
+    attachment_ids = fields.Many2many(
+        'ir.attachment',
+        'case_registration_attachment_rel',
+        'case_id',
+        'attachment_id',
+        string='Attachments'
+    )
     is_court_out_of_settlement = fields.Boolean(string="Court Out of Settlement", default=False,
                                                 help="Indicates whether the case is outside the settlement process.")
 
