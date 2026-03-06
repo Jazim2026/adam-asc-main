@@ -63,7 +63,7 @@ class PortalLegalCase(CustomerPortal):
             "legal_case_management.portal_my_legal_case_requests",
             values)
 
-    @http.route(['/my/cases/<int:case_id>'], type='http', auth="public",
+    @http.route(['/my/cases/<int:case_id>'], type='http', auth="user",
                 website=True)
     def portal_my_details_detail(self, case_id):
         """ Returns the Portal details"""

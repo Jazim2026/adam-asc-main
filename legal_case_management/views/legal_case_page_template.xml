@@ -23,15 +23,74 @@
                         <div t-call="legal_case_management.case_portal_content"/>
                     </div>
                 </div>
-                 <div class="d-flex flex-row align-self-end p-2">
-                    <a t-attf-href="/my/cases/schedule_meeting/#{case_record.id}?{{ keep_query() }}" class="btn btn-primary o-last rounded-3">Schedule a meeting</a>
+
+                <!-- 👇 UPLOAD FORM - PUTHUTHA CHERTHA PART -->
+                <div class="col-12 mt-4">
+                    <div class="card">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Upload Documents</h5>
+                        </div>
+                        <div class="card-body">
+                            <form t-attf-action="/my/cases/#{case_record.id}/upload"
+                                  method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token"
+                                       t-att-value="request.csrf_token()"/>
+                                <div class="input-group mb-3">
+                                    <input type="file" name="attachment"
+                                           class="form-control" required="1"/>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-upload"/> Upload
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Uploaded Files List -->
+                            <t t-set="attachments" t-value="request.env['ir.attachment'].sudo().search([
+                                ('res_id', '=', case_record.id),
+                                ('res_model', '=', 'case.registration')
+                            ])"/>
+                            <t t-if="attachments">
+                                <table class="table table-sm mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th>File Name</th>
+                                            <th>Download</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="attachments" t-as="attachment">
+                                            <tr>
+                                                <td>
+                                                    <i class="fa fa-paperclip"/>
+                                                    <t t-esc="attachment.name"/>
+                                                </td>
+                                                <td>
+                                                    <a t-attf-href="/web/content/#{attachment.id}?download=true"
+                                                       class="btn btn-sm btn-success">
+                                                        <i class="fa fa-download"/> Download
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">No documents uploaded yet.</p>
+                            </t>
+                        </div>
+                    </div>
                 </div>
-                <div id="legal_case_communication"
-                     class="mt-4">
+                <!-- 👆 UPLOAD FORM END -->
+
+                <div class="d-flex flex-row align-self-end p-2">
+                    <a t-attf-href="/my/cases/schedule_meeting/#{case_record.id}?{{ keep_query() }}"
+                       class="btn btn-primary o-last rounded-3">Schedule a meeting</a>
+                </div>
+                <div id="legal_case_communication" class="mt-4">
                     <h2>History</h2>
                     <t t-call="portal.message_thread">
-                        <t t-set="object"
-                           t-value="case_record"/>
+                        <t t-set="object" t-value="case_record"/>
                     </t>
                 </div>
             </div>
@@ -50,26 +109,19 @@
                 <div class="row" id="so_date">
                     <div class="mb-3 col-6">
                         <strong>Register Date:</strong>
-
                         <span t-field="case_record.start_date"
                               t-options='{"widget": "date"}'/>
                     </div>
                 </div>
                 <div class="row" id="invoicing_shipping_address">
                     <div class="col-lg-6">
-                        <strong class="d-block mb-1">
-
-                            Client Details:
-                        </strong>
+                        <strong class="d-block mb-1">Client Details:</strong>
                         <address t-field="case_record.client_id"
                                  t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
                     </div>
-                    <div id="lawyer_details"
-                         class="col-lg-6">
+                    <div id="lawyer_details" class="col-lg-6">
                         <t t-if="case_record.lawyer_id">
-                            <strong class="d-block mb-1">
-                                Lawyer:
-                            </strong>
+                            <strong class="d-block mb-1">Lawyer:</strong>
                             <address t-field="case_record.lawyer_id.name"/>
                         </t>
                     </div>
@@ -77,32 +129,19 @@
             </div>
             <section id="details" style="page-break-inside: auto;" class="mt32">
                 <h3 id="details">Case Details</h3>
-                <table t-att-data-order-id="case_record.id"
-                       class="table table-sm">
+                <table t-att-data-order-id="case_record.id" class="table table-sm">
                     <thead class="bg-100">
                         <tr>
-                            <th class="text-start" id="product_name_header">
-                                Case Category
-                            </th>
-                            <th class="text-start" id="product_name_header">
-                                Case Details
-                            </th>
-                            <th class="text-start" id="product_name_header">
-                                Contact Number
-                            </th>
+                            <th class="text-start">Case Category</th>
+                            <th class="text-start">Case Details</th>
+                            <th class="text-start">Contact Number</th>
                             <t t-if="evidence">
-                                <th class="text-start" id="product_name_header">
-                                    Evidence
-                                </th>
+                                <th class="text-start">Evidence</th>
                             </t>
                             <t t-if="trial">
-                                <th class="text-start" id="product_name_header">
-                                    Trial
-                                </th>
+                                <th class="text-start">Trial</th>
                             </t>
-                            <th class="text-start" id="product_name_header">
-                                State
-                            </th>
+                            <th class="text-start">State</th>
                         </tr>
                     </thead>
                     <tbody class="sale_tbody">
@@ -118,77 +157,68 @@
                             </td>
                             <t t-if="evidence">
                                 <t t-foreach="evidence" t-as="evidence">
-                                    <td>
-                                        <span t-field="evidence.name"/>
-                                    </td>
+                                    <td><span t-field="evidence.name"/></td>
                                     <br/>
                                 </t>
                             </t>
                             <t t-if="evidence">
                                 <t t-foreach="trial" t-as="trial">
-                                    <td>
-                                        <span t-field="trial.name"/>
-                                    </td>
+                                    <td><span t-field="trial.name"/></td>
                                 </t>
                             </t>
                             <td>
                                 <t t-if="case_record.state=='draft'">
                                     <span class="badge rounded-pill text-bg-info">
-                                        <i class="fa fa-fw fa-clock-o"
-                                           aria-label="Opened" title="Opened"
-                                           role="img"/>
-                                        <span class="d-none d-md-inline">Draft
-                                        </span>
+                                        <i class="fa fa-fw fa-clock-o"/>
+                                        <span class="d-none d-md-inline">Draft</span>
                                     </span>
                                 </t>
                                 <t t-if="case_record.state=='in_progress'">
                                     <span class="badge rounded-pill text-bg-success">
-                                        <i class="fa fa-fw fa-check"
-                                           aria-label="In Progress" title="Paid"
-                                           role="img"/>
-                                        <span class="d-none d-md-inline">In
-                                            Progress
-                                        </span>
+                                        <i class="fa fa-fw fa-check"/>
+                                        <span class="d-none d-md-inline">In Progress</span>
                                     </span>
                                 </t>
-                                <t t-if="case_record=='invoiced'">
+                                <t t-if="case_record.state=='invoiced'">
                                     <span class="badge rounded-pill text-bg-success">
-                                        <i class="fa fa-fw fa-check"
-                                           aria-label="Reversed"
-                                           title="Invoiced" role="img"/>
-                                        <span class="d-none d-md-inline">
-                                            Invoiced
-                                        </span>
+                                        <i class="fa fa-fw fa-check"/>
+                                        <span class="d-none d-md-inline">Invoiced</span>
                                     </span>
                                 </t>
                                 <t t-if="case_record.state=='won'">
                                     <span class="badge rounded-pill text-bg-success">
-                                        <i class="fa fa-fw fa-check"
-                                           aria-label="Reversed"
-                                           title="Invoiced" role="img"/>
-                                        <span class="d-none d-md-inline">
-                                            Won
-                                        </span>
+                                        <i class="fa fa-fw fa-trophy"/>
+                                        <span class="d-none d-md-inline">Won</span>
                                     </span>
                                 </t>
                                 <t t-if="case_record.state=='lost'">
                                     <span class="badge rounded-pill text-bg-danger">
-                                        <i class="fa fa-fw fa-check"
-                                           aria-label="Reversed"
-                                           title="Lost" role="img"/>
-                                        <span class="d-none d-md-inline">
-                                            Lost
-                                        </span>
+                                        <i class="fa fa-fw fa-times"/>
+                                        <span class="d-none d-md-inline">Lost</span>
                                     </span>
                                 </t>
                                 <t t-if="case_record.state=='cancel'">
                                     <span class="badge rounded-pill text-bg-warning">
-                                        <i class="fa fa-fw fa-remove"
-                                           aria-label="Cancelled"
-                                           title="Cancelled" role="img"/>
-                                        <span class="d-none d-md-inline">
-                                            Cancelled
-                                        </span>
+                                        <i class="fa fa-fw fa-remove"/>
+                                        <span class="d-none d-md-inline">Cancelled</span>
+                                    </span>
+                                </t>
+                                <t t-if="case_record.state=='reject'">
+                                    <span class="badge rounded-pill text-bg-danger">
+                                        <i class="fa fa-fw fa-times"/>
+                                        <span class="d-none d-md-inline">Rejected</span>
+                                    </span>
+                                </t>
+                                <t t-if="case_record.state=='out_of_court_settlement'">
+                                    <span class="badge rounded-pill text-bg-info">
+                                        <i class="fa fa-fw fa-handshake-o"/>
+                                        <span class="d-none d-md-inline">Out of Court</span>
+                                    </span>
+                                </t>
+                                <t t-if="case_record.state=='contract_finished'">
+                                    <span class="badge rounded-pill text-bg-secondary">
+                                        <i class="fa fa-fw fa-check-circle"/>
+                                        <span class="d-none d-md-inline">Contract Finished</span>
                                     </span>
                                 </t>
                             </td>
