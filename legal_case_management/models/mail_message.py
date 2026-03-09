@@ -75,28 +75,20 @@ class MailMessage(models.Model):
             if partner.email:
                 email_list.append(partner.email)
 
-        # 2. Fallback — case record-ലെ client email
+        # 2. Fallback — case record-ലെ client_id email
         if not email_list and self.res_id \
                 and self.model == 'case.registration':
             case = self.env['case.registration'].sudo().browse(
                 self.res_id
             )
-            # partner_id field check
-            if hasattr(case, 'partner_id') \
-                    and case.partner_id \
-                    and case.partner_id.email:
-                email_list.append(case.partner_id.email)
-            # email field directly on case
-            elif hasattr(case, 'email') and case.email:
-                email_list.append(case.email)
-            # client_id field check
-            elif hasattr(case, 'client_id') \
-                    and case.client_id \
-                    and case.client_id.email:
+            if case.client_id and case.client_id.email:
                 email_list.append(case.client_id.email)
+                _logger.info(
+                    "Email Approval: Using client_id email: %s",
+                    case.client_id.email
+                )
 
         return email_list
-
     def _notify_admins_pending(self):
         admin_group = self.env.ref(
             'legal_case_management'
