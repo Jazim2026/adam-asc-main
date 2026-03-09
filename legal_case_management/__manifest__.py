@@ -74,6 +74,7 @@
         'views/legal_case_page_template.xml',
         'views/contract_case_views.xml',
         'views/ir_attachments_views.xml',
+        'views/mail_approval_views.xml',
 
     ],
     'assets': {

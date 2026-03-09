@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+
+    <!-- Reject Wizard Form -->
+    <record id="view_mail_reject_wizard_form" model="ir.ui.view">
+        <field name="name">mail.reject.reason.wizard.form</field>
+        <field name="model">mail.reject.reason.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reject Email">
+                <group>
+                    <field name="rejection_reason"
+                           placeholder="Reason for rejection..."/>
+                </group>
+                <footer>
+                    <button name="action_confirm_reject"
+                            string="Confirm Reject"
+                            type="object"
+                            class="btn-danger"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Approval Queue Tree -->
+    <record id="view_mail_approval_tree" model="ir.ui.view">
+        <field name="name">mail.message.approval.tree</field>
+        <field name="model">mail.message</field>
+        <field name="arch" type="xml">
+            <tree string="Email Approval Queue">
+                <field name="submitted_by"/>
+                <field name="date"/>
+                <field name="subject"/>
+                <field name="partner_ids" widget="many2many_tags"/>
+                <field name="approval_state"
+                       widget="badge"
+                       decoration-warning="approval_state == 'pending'"
+                       decoration-success="approval_state == 'approved'"
+                       decoration-danger="approval_state == 'rejected'"/>
+                <button name="action_approve"
+                        string="Approve"
+                        type="object"
+                        icon="fa-check"
+                        invisible="approval_state != 'pending'"
+                        groups="legal_case_management.legal_case_management_group_admin"/>
+                <button name="action_reject"
+                        string="Reject"
+                        type="object"
+                        icon="fa-times"
+                        invisible="approval_state != 'pending'"
+                        groups="legal_case_management.legal_case_management_group_admin"/>
+                <button name="action_resubmit"
+                        string="Resubmit"
+                        type="object"
+                        icon="fa-refresh"
+                        invisible="approval_state != 'rejected'"
+                        groups="legal_case_management.legal_case_management_group_lawyer"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Approval Queue Form -->
+    <record id="view_mail_approval_form" model="ir.ui.view">
+        <field name="name">mail.message.approval.form</field>
+        <field name="model">mail.message</field>
+        <field name="arch" type="xml">
+            <form string="Email Approval">
+                <header>
+                    <button name="action_approve"
+                            string="✅ Approve and Send"
+                            type="object"
+                            class="btn-primary"
+                            invisible="approval_state != 'pending'"
+                            groups="legal_case_management.legal_case_management_group_admin"/>
+                    <button name="action_reject"
+                            string="❌ Reject"
+                            type="object"
+                            class="btn-danger"
+                            invisible="approval_state != 'pending'"
+                            groups="legal_case_management.legal_case_management_group_admin"/>
+                    <button name="action_resubmit"
+                            string="🔄 Edit and Resubmit"
+                            type="object"
+                            class="btn-warning"
+                            invisible="approval_state != 'rejected'"
+                            groups="legal_case_management.legal_case_management_group_lawyer"/>
+                    <field name="approval_state"
+                           widget="statusbar"
+                           statusbar_visible="pending,approved,rejected"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="subject"/>
+                        <field name="submitted_by"/>
+                        <field name="partner_ids" widget="many2many_tags"/>
+                        <field name="date"/>
+                        <field name="rejection_reason"
+                               invisible="approval_state != 'rejected'"
+                               readonly="1"/>
+                    </group>
+                    <group string="Email Body">
+                        <field name="body" widget="html" nolabel="1"
+                               readonly="approval_state not in ('draft', 'rejected')"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_mail_approval_queue" model="ir.actions.act_window">
+        <field name="name">Email Approvals</field>
+        <field name="res_model">mail.message</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">
+            [('submitted_by', '!=', False),
+            ('approval_state', 'in', ['pending','approved','rejected'])]
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_mail_approval_queue"
+              name="📧 Email Approvals"
+              parent="legal_case_management.legal_case_management_root"
+              action="action_mail_approval_queue"
+              groups="legal_case_management.legal_case_management_group_admin"
+              sequence="6"/>
+
+</odoo>

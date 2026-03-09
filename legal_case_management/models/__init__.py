@@ -31,3 +31,4 @@ from . import legal_evidence
 from . import legal_trial
 from . import res_partner
 from . import contract_cases
+from . import mail_message
