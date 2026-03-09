@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+import logging
 from odoo import models, fields, exceptions, _
+
+_logger = logging.getLogger(__name__)
 
 
 class MailThread(models.AbstractModel):
     _inherit = 'mail.thread'
 
     def _notify_thread(self, message, msg_vals=False, **kwargs):
-        # Recursion prevent — context check
         if self.env.context.get('mail_approval_processing'):
             return super()._notify_thread(
                 message, msg_vals=msg_vals, **kwargs
@@ -19,7 +22,6 @@ class MailThread(models.AbstractModel):
             'legal_case_management.legal_case_management_group_admin'
         )
 
-        # Case model മാത്രം intercept
         allowed_models = ['case.registration']
         if self._name not in allowed_models:
             return super()._notify_thread(
@@ -29,7 +31,6 @@ class MailThread(models.AbstractModel):
         partner_ids = msg_vals.get('partner_ids', []) \
             if msg_vals else []
         is_external = bool(partner_ids or message.partner_ids)
-
         is_automated = message.message_type in (
             'notification', 'auto_comment'
         )
@@ -41,11 +42,10 @@ class MailThread(models.AbstractModel):
                     'approval_state': 'pending',
                     'submitted_by': self.env.uid,
                 })
-                # context set ചെയ്ത് recursion block
                 message.with_context(
                     mail_approval_processing=True
                 )._notify_admins_pending()
-                return message  # Block!
+                return message
 
         return super()._notify_thread(
             message, msg_vals=msg_vals, **kwargs
@@ -82,7 +82,6 @@ class MailMessage(models.Model):
             if self.submitted_by else 'Lawyer'
 
         for admin in admins:
-            # with_context — recursion prevent
             self.env['mail.activity'].with_context(
                 mail_approval_processing=True
             ).sudo().create({
@@ -109,14 +108,32 @@ class MailMessage(models.Model):
 
         self.sudo().write({'approval_state': 'approved'})
 
+        # Partner emails collect ചെയ്യുക
+        email_to_list = [
+            p.email for p in self.partner_ids if p.email
+        ]
+
+        if not email_to_list:
+            _logger.warning(
+                "Email Approval: No partner emails found "
+                "for message id=%s subject=%s",
+                self.id, self.subject
+            )
+            # Lawyer-നെ notify ചെയ്യുക — mail പോയില്ലെങ്കിലും
+            self._notify_lawyer(approved=True)
+            return
+
         self.env['mail.mail'].sudo().create({
             'subject': self.subject or _('Message from Legal Team'),
             'body_html': self.body,
-            'email_to': ','.join(
-                p.email for p in self.partner_ids if p.email
-            ),
+            'email_to': ','.join(email_to_list),
             'auto_delete': True,
         }).send()
+
+        _logger.info(
+            "Email Approval: Mail sent to %s for message id=%s",
+            email_to_list, self.id
+        )
 
         self._notify_lawyer(approved=True)
 
