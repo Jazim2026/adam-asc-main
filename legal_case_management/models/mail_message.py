@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 import logging
 from odoo import models, fields, exceptions, _
 
@@ -67,6 +66,37 @@ class MailMessage(models.Model):
         'res.users', string='Submitted By'
     )
 
+    def _get_client_email(self):
+        """Case registration-ലെ client email എടുക്കുക"""
+        email_list = []
+
+        # 1. Message-ലെ partner_ids-ൽ നിന്ന്
+        for partner in self.partner_ids:
+            if partner.email:
+                email_list.append(partner.email)
+
+        # 2. Fallback — case record-ലെ client email
+        if not email_list and self.res_id \
+                and self.model == 'case.registration':
+            case = self.env['case.registration'].sudo().browse(
+                self.res_id
+            )
+            # partner_id field check
+            if hasattr(case, 'partner_id') \
+                    and case.partner_id \
+                    and case.partner_id.email:
+                email_list.append(case.partner_id.email)
+            # email field directly on case
+            elif hasattr(case, 'email') and case.email:
+                email_list.append(case.email)
+            # client_id field check
+            elif hasattr(case, 'client_id') \
+                    and case.client_id \
+                    and case.client_id.email:
+                email_list.append(case.client_id.email)
+
+        return email_list
+
     def _notify_admins_pending(self):
         admin_group = self.env.ref(
             'legal_case_management'
@@ -108,19 +138,17 @@ class MailMessage(models.Model):
 
         self.sudo().write({'approval_state': 'approved'})
 
-        # Partner emails collect ചെയ്യുക
-        email_to_list = [
-            p.email for p in self.partner_ids if p.email
-        ]
+        # Client email എടുക്കുക
+        email_to_list = self._get_client_email()
 
         if not email_to_list:
             _logger.warning(
-                "Email Approval: No partner emails found "
-                "for message id=%s subject=%s",
-                self.id, self.subject
+                "Email Approval: No client email found "
+                "for message id=%s subject=%s model=%s res_id=%s",
+                self.id, self.subject, self.model, self.res_id
             )
-            # Lawyer-നെ notify ചെയ്യുക — mail പോയില്ലെങ്കിലും
-            self._notify_lawyer(approved=True)
+            self._notify_lawyer(approved=False,
+                reason="No client email found. Please add client email.")
             return
 
         self.env['mail.mail'].sudo().create({
