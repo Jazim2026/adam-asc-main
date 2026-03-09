@@ -6,6 +6,12 @@ class MailThread(models.AbstractModel):
     _inherit = 'mail.thread'
 
     def _notify_thread(self, message, msg_vals=False, **kwargs):
+        # Recursion prevent — context check
+        if self.env.context.get('mail_approval_processing'):
+            return super()._notify_thread(
+                message, msg_vals=msg_vals, **kwargs
+            )
+
         is_lawyer = self.env.user.has_group(
             'legal_case_management.legal_case_management_group_lawyer'
         )
@@ -13,7 +19,7 @@ class MailThread(models.AbstractModel):
             'legal_case_management.legal_case_management_group_admin'
         )
 
-        # Case model മാത്രം intercept ചെയ്യുക
+        # Case model മാത്രം intercept
         allowed_models = ['case.registration']
         if self._name not in allowed_models:
             return super()._notify_thread(
@@ -24,12 +30,10 @@ class MailThread(models.AbstractModel):
             if msg_vals else []
         is_external = bool(partner_ids or message.partner_ids)
 
-        # Automated system mails skip ചെയ്യുക
         is_automated = message.message_type in (
             'notification', 'auto_comment'
         )
 
-        # Lawyer external mail block ചെയ്യുക
         if is_lawyer and not is_admin \
                 and is_external and not is_automated:
             if message.approval_state != 'approved':
@@ -37,8 +41,11 @@ class MailThread(models.AbstractModel):
                     'approval_state': 'pending',
                     'submitted_by': self.env.uid,
                 })
-                message._notify_admins_pending()
-                return message  # ← Block!
+                # context set ചെയ്ത് recursion block
+                message.with_context(
+                    mail_approval_processing=True
+                )._notify_admins_pending()
+                return message  # Block!
 
         return super()._notify_thread(
             message, msg_vals=msg_vals, **kwargs
@@ -68,16 +75,17 @@ class MailMessage(models.Model):
         admins = self.env['res.users'].search([
             ('groups_id', 'in', admin_group.id)
         ])
-        # case model-ന്റെ res_id use ചെയ്യുക
         res_model = self.model or 'mail.message'
         res_id = self.res_id or self.id
         model_id = self.env['ir.model']._get(res_model).id
-
         submitted_name = self.submitted_by.name \
             if self.submitted_by else 'Lawyer'
 
         for admin in admins:
-            self.env['mail.activity'].sudo().create({
+            # with_context — recursion prevent
+            self.env['mail.activity'].with_context(
+                mail_approval_processing=True
+            ).sudo().create({
                 'activity_type_id': self.env.ref(
                     'mail.mail_activity_data_todo'
                 ).id,
@@ -101,7 +109,6 @@ class MailMessage(models.Model):
 
         self.sudo().write({'approval_state': 'approved'})
 
-        # Client-ന് actual mail send
         self.env['mail.mail'].sudo().create({
             'subject': self.subject or _('Message from Legal Team'),
             'body_html': self.body,
@@ -136,7 +143,9 @@ class MailMessage(models.Model):
             'approval_state': 'pending',
             'rejection_reason': False,
         })
-        self._notify_admins_pending()
+        self.with_context(
+            mail_approval_processing=True
+        )._notify_admins_pending()
 
     def _notify_lawyer(self, approved=True, reason=None):
         lawyer = self.submitted_by
@@ -152,8 +161,9 @@ class MailMessage(models.Model):
                 '<b>Reason:</b> %s'
             ) % (self.subject or '', reason or '-')
 
-        # message_notify പകരം mail.message create
-        self.env['mail.message'].sudo().create({
+        self.env['mail.message'].with_context(
+            mail_approval_processing=True
+        ).sudo().create({
             'message_type': 'notification',
             'body': body,
             'subject': _('Email Approval Update'),
