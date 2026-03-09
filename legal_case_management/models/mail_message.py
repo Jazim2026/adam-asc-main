@@ -70,9 +70,15 @@ class MailMessage(models.Model):
         """Case registration-ലെ client email എടുക്കുക"""
         email_list = []
 
-        # 1. Message-ലെ partner_ids-ൽ നിന്ന്
+        # Internal users (lawyers/admins) partner ids
+        internal_partner_ids = self.env['res.users'].sudo().search([
+            ('share', '=', False)
+        ]).mapped('partner_id.id')
+
+        # 1. Message partner_ids-ൽ നിന്ന് — internal users exclude
         for partner in self.partner_ids:
-            if partner.email:
+            if partner.email \
+                    and partner.id not in internal_partner_ids:
                 email_list.append(partner.email)
 
         # 2. Fallback — case record-ലെ client_id email
@@ -89,6 +95,7 @@ class MailMessage(models.Model):
                 )
 
         return email_list
+
     def _notify_admins_pending(self):
         admin_group = self.env.ref(
             'legal_case_management'
@@ -130,7 +137,6 @@ class MailMessage(models.Model):
 
         self.sudo().write({'approval_state': 'approved'})
 
-        # Client email എടുക്കുക
         email_to_list = self._get_client_email()
 
         if not email_to_list:
@@ -139,8 +145,11 @@ class MailMessage(models.Model):
                 "for message id=%s subject=%s model=%s res_id=%s",
                 self.id, self.subject, self.model, self.res_id
             )
-            self._notify_lawyer(approved=False,
-                reason="No client email found. Please add client email.")
+            self._notify_lawyer(
+                approved=False,
+                reason="No client email found. "
+                       "Please add client email."
+            )
             return
 
         self.env['mail.mail'].sudo().create({
