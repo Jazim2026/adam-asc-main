@@ -38,7 +38,7 @@ class MailThread(models.AbstractModel):
                     'submitted_by': self.env.uid,
                 })
                 message._notify_admins_pending()
-                return message  # ← Block! Client-ന് പോകില്ല
+                return message  # ← Block!
 
         return super()._notify_thread(
             message, msg_vals=msg_vals, **kwargs
@@ -68,21 +68,27 @@ class MailMessage(models.Model):
         admins = self.env['res.users'].search([
             ('groups_id', 'in', admin_group.id)
         ])
+        # case model-ന്റെ res_id use ചെയ്യുക
+        res_model = self.model or 'mail.message'
+        res_id = self.res_id or self.id
+        model_id = self.env['ir.model']._get(res_model).id
+
+        submitted_name = self.submitted_by.name \
+            if self.submitted_by else 'Lawyer'
+
         for admin in admins:
             self.env['mail.activity'].sudo().create({
                 'activity_type_id': self.env.ref(
                     'mail.mail_activity_data_todo'
                 ).id,
-                'res_model_id': self.env['ir.model']._get(
-                    'mail.message'
-                ).id,
-                'res_id': self.id,
+                'res_model_id': model_id,
+                'res_id': res_id,
                 'user_id': admin.id,
                 'summary': _('Email Approval Required'),
                 'note': _(
                     'Email from <b>%s</b> to client '
                     'is pending your approval.'
-                ) % self.submitted_by.name,
+                ) % submitted_name,
             })
 
     def action_approve(self):
@@ -145,10 +151,18 @@ class MailMessage(models.Model):
                 '❌ Your email <b>"%s"</b> rejected.<br/>'
                 '<b>Reason:</b> %s'
             ) % (self.subject or '', reason or '-')
-        lawyer.partner_id.message_notify(
-            subject=_('Email Approval Update'),
-            body=body,
-        )
+
+        # message_notify പകരം mail.message create
+        self.env['mail.message'].sudo().create({
+            'message_type': 'notification',
+            'body': body,
+            'subject': _('Email Approval Update'),
+            'partner_ids': [(4, lawyer.partner_id.id)],
+            'model': 'res.partner',
+            'res_id': lawyer.partner_id.id,
+            'subtype_id': self.env.ref('mail.mt_note').id,
+            'author_id': self.env.user.partner_id.id,
+        })
 
 
 class MailRejectReasonWizard(models.TransientModel):
