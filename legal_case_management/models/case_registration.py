@@ -199,12 +199,6 @@ class CaseRegistration(models.Model):
                     break
             if self.lawyer_unavailable:
                 return {
-                    'warning': {
-                        'title': 'Lawyer Unavailable',
-                        'message': 'The selected lawyer is unavailable '
-                                   'at this time.'
-                                   'You can choose his juniors.',
-                    },
                     'domain': {
                         'junior_lawyer_id': [('parent_id', '=',
                                               self.lawyer_id.id),

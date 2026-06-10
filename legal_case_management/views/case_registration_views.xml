@@ -133,7 +133,7 @@
                     <button name="action_invoice"
                             string="Create Invoice" type="object"
                             class="oe_highlight"
-                            invisible="state != 'in_progress' or payment_method in ('per_contract') or is_non_billable_case"/>
+                            invisible="state != 'in_progress' or is_non_billable_case"/>
 
                     <button name="action_full_settlement"
                             string="Full Settlement" type="object"
