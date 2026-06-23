@@ -37,7 +37,7 @@ class PortalLegalCase(CustomerPortal):
         if 'case_count' in counters:
             values['case_count'] = request.env[
                 'case.registration'].sudo().search_count(
-                [('state', '!=', 'invoiced'), '|',
+                ['|',
                  ('client_id.id', '=', request.env.user.partner_id.id),
                  ('agent_id.id', '=', request.env.user.partner_id.id)]) \
                 if request.env['case.registration'].sudo(). \
